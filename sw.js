@@ -1,6 +1,6 @@
 // Service worker do Guia de Plantas.
 // Ao publicar uma nova versão do app, aumente o número abaixo para os usuários receberem a atualização.
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = "guia-plantas-" + VERSION;
 const APP_SHELL = [
   "./",
@@ -33,7 +33,7 @@ self.addEventListener("fetch", (event) => {
   // Páginas: tenta a rede primeiro (pega atualizações) e cai para o cache se estiver offline.
   if (req.mode === "navigate") {
     event.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: "no-cache" }) // revalida no servidor, sem usar cache HTTP antigo
         .then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put("./index.html", copy)); return res; })
         .catch(() => caches.match("./index.html"))
     );

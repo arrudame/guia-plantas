@@ -59,7 +59,7 @@ img,svg{max-width:100%}
 
 /* --tabs-h: altura real da barra de abas (medida via JS; o valor abaixo é só o padrão) */
 :root{--tabs-h:calc(66px + env(safe-area-inset-bottom,0px))}
-main{padding-top:6px;padding-bottom:calc(var(--tabs-h) + 32px)}
+#main{padding-top:6px;padding-bottom:calc(var(--tabs-h) + 32px)} /* #main: precisa vencer o padding de .wrap */
 
 /* abas */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
