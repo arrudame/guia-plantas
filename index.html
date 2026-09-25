@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guia de Plantas (MVP)</title>
+<meta name="description" content="Guia de plantas de interior e diagnóstico de problemas por sintomas.">
+<meta name="theme-color" content="#E8EEE6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1612" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Plantas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EEE6;--surface:#FFFFFF;--ink:#1B3325;--muted:#566B5C;--line:#CAD6CA;
+  --accent:#2E6A3E;--accent-ink:#FFFFFF;--chip:#DCE6DA;--tile:#F1F5EC;
+  --spec:#F5E3A6;--spec-ink:#5E450A;--danger:#9B3B2B;--safe:#2E6A3E;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1612;--surface:#17211B;--ink:#E2ECE3;--muted:#9AB09F;--line:#2A3A2F;
+    --accent:#86C595;--accent-ink:#0D1A11;--chip:#23322A;--tile:#DCE5D6;
+    --spec:#3B3316;--spec-ink:#F1DA8C;--danger:#E58C78;--safe:#86C595;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1612;--surface:#17211B;--ink:#E2ECE3;--muted:#9AB09F;--line:#2A3A2F;
+  --accent:#86C595;--accent-ink:#0D1A11;--chip:#23322A;--tile:#DCE5D6;
+  --spec:#3B3316;--spec-ink:#F1DA8C;--danger:#E58C78;--safe:#86C595;color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,svg{max-width:100%}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:10px;height:54px}
+.back{border:0;background:var(--chip);color:var(--ink);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}
+.back svg{width:18px;height:18px}
+.brand{font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:-.01em}
+.ver{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:auto}
+
+main{padding-top:6px;padding-bottom:110px}
+
+/* abas */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs-in{display:flex;max-width:560px;margin:0 auto}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px 10px;text-decoration:none;color:var(--muted);font-size:12.5px;font-weight:600}
+.tab svg{width:23px;height:23px}
+.tab.on{color:var(--accent)}
+
+/* tipografia */
+h1{font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.08;margin:18px 0 6px;letter-spacing:-.015em}
+h2{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.2;margin:30px 0 10px}
+.lead{color:var(--muted);margin:0 0 16px;max-width:60ch}
+.sci{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:15px}
+.sci.big{font-size:19px;margin:0 0 12px}
+.small{font-size:14px;color:var(--muted)}
+
+/* busca e chips */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:0 14px;height:52px;margin-top:6px}
+.search:focus-within{border-color:var(--accent)}
+.search svg{width:20px;height:20px;color:var(--muted);flex:none}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:16px;color:inherit;outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 13px;font:inherit;font-size:14.5px;line-height:1.3;cursor:pointer;text-align:left}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* grupos e listas */
+.list{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;padding:14px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.row.sm{grid-template-columns:40px 1fr auto;padding:11px 2px}
+.sw{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--gc)}
+.row.sm .sw{width:40px;height:40px;font-size:20px}
+.rname{font-weight:600;font-size:17px;display:block;line-height:1.3}
+.rmeta{font-size:13.5px;color:var(--muted);display:block;margin-top:2px}
+.rside{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.chev{color:var(--muted)}
+.empty{padding:24px 0;color:var(--muted)}
+
+/* ficha */
+.gchip{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:14px;font-weight:600;padding:5px 12px 5px 8px;border-radius:999px;background:var(--gc);color:#1B3325;margin-top:14px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 18px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;padding:4px 11px;border-radius:999px;background:var(--chip)}
+.badge.toxic{color:var(--danger);background:color-mix(in srgb,var(--danger) 13%,transparent)}
+.badge.safe{color:var(--safe);background:color-mix(in srgb,var(--safe) 13%,transparent)}
+.care{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.crow{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+.crow:first-child{border-top:0}
+.cico{font-size:19px;line-height:1.4}
+.clabel{font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctext{margin-top:3px}
+.cbase{margin-top:6px;font-size:13.5px;color:var(--muted)}
+.src{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.crow.spec{background:color-mix(in srgb,var(--spec) 45%,var(--surface))}
+.crow.spec .src{background:var(--spec);color:var(--spec-ink)}
+.legend{font-size:13.5px;color:var(--muted);margin:10px 2px 0}
+
+/* ilustrações e problemas */
+.ill{background:var(--tile);display:grid;place-items:center;aspect-ratio:4/3}
+.ill svg{height:86%;width:auto}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.ptile{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.ptile .pt{padding:10px 12px 12px}
+.ptile .pn{font-weight:600;line-height:1.3;display:block}
+.cat{font-size:12.5px;color:var(--muted)}
+.hero-ill{background:var(--tile);border-radius:22px;aspect-ratio:16/10;display:grid;place-items:center;margin:14px 0 4px}
+.hero-ill svg{height:88%;width:auto}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;font-size:13px}
+.sev{font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--chip)}
+.sev.s3{color:var(--danger);background:color-mix(in srgb,var(--danger) 13%,transparent)}
+
+/* diagnóstico */
+.soon{display:flex;gap:14px;align-items:center;padding:14px 16px;border:1.5px dashed var(--line);border-radius:16px;color:var(--muted);font-size:14.5px;margin:6px 0 4px}
+.soon svg{width:30px;height:30px;flex:none}
+.step{margin-top:26px}
+.step h2{margin:0 0 4px;display:flex;gap:10px;align-items:baseline}
+.step h2 .n{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--accent-ink);background:var(--accent);border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;transform:translateY(-3px)}
+.sub{font-size:14px;font-weight:700;color:var(--muted);margin:16px 0 0}
+select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+.ctabar{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom,0px));padding:14px 0 6px;margin-top:20px;background:linear-gradient(to bottom,transparent,var(--bg) 35%)}
+.ctabar-in{display:flex;gap:10px}
+.cta{flex:1;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:15px;font:inherit;font-weight:700;font-size:16px;cursor:pointer;text-align:center;text-decoration:none}
+.cta:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);border-radius:14px;padding:15px 16px;font:inherit;font-weight:600;cursor:pointer}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin:6px 0 0;min-height:1.2em}
+.res{display:grid;grid-template-columns:92px 1fr;gap:14px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;text-decoration:none;color:inherit;margin-bottom:10px;align-items:center}
+.res .ill{aspect-ratio:1;border-radius:12px}
+.res .pn{font-weight:700;font-size:17px;line-height:1.25;display:block;margin:4px 0 2px}
+.res p{margin:0;font-size:14px;color:var(--muted)}
+.match{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;display:inline-block}
+.m3{background:var(--accent);color:var(--accent-ink)}
+.m2{background:var(--chip)}
+.m1{border:1px solid var(--line);color:var(--muted)}
+.mini{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 18px}
+.mini span{font-size:13px;background:var(--chip);border-radius:999px;padding:3px 10px}
+.note{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:18px 0}
+details summary{cursor:pointer;font-weight:600;padding:10px 0;color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <button class="back" id="back" hidden aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <span class="brand">Guia de Plantas</span>
+    <span class="ver">MVP</span>
+  </div>
+</header>
+
+<main id="main" class="wrap"></main>
+
+<nav class="tabs" aria-label="Seções">
+  <div class="tabs-in">
+    <a class="tab" data-tab="guia" href="#/guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-9 5-15 15-16-1 10-7 15-15 16z"/><path d="M5 20l8-8"/></svg>Guia</a>
+    <a class="tab" data-tab="diag" href="#/diag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg>Diagnóstico</a>
+    <a class="tab" data-tab="problemas" href="#/problemas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Problemas</a>
+  </div>
+</nav>
+
+<script>
+/* ============================================================
+   DADOS — grupos de cuidado, espécies (herdam do grupo) e problemas
+   ============================================================ */
+const GROUPS = [
+  { id:"folhagens", nome:"Folhagens tropicais", emoji:"🌿", color:"#CFE3C1", d:1, luzTipo:["meia"],
+    desc:"Plantas de floresta tropical que vivem à sombra de árvores maiores: gostam de claridade sem sol forte e de rega moderada.",
+    care:{
+      luz:"Luz indireta clara a média. Sol direto só nas primeiras horas da manhã.",
+      rega:"Quando os 2–3 cm de cima do substrato estiverem secos (teste com o dedo). Regue até escorrer e esvazie o pratinho.",
+      umidade:"50–60% é o ideal, mas tolera a umidade normal de casa.",
+      temperatura:"18–27 °C. Abaixo de 12 °C começa a sofrer.",
+      substrato:"Aerado: terra vegetal + casca de pinus + perlita, em vaso com furo.",
+      adubacao:"Adubo líquido equilibrado (NPK tipo 10-10-10) diluído, a cada 3–4 semanas na primavera e no verão. Pausar no inverno.",
+      extra:"Limpe as folhas de vez em quando e gire o vaso para a planta crescer por igual."
+    }},
+  { id:"exigentes", nome:"Marantáceas e amantes de umidade", emoji:"🍃", color:"#C6DFD8", d:3, luzTipo:["meia","sombra"],
+    desc:"Folhagens decorativas que pedem umidade alta e rega constante. Bonitas, mas pouco tolerantes a descuidos.",
+    care:{
+      luz:"Luz indireta média a baixa. Sol direto queima e desbota as folhas rapidamente.",
+      rega:"Substrato sempre levemente úmido: nunca encharcado, nunca totalmente seco. Prefira água filtrada, de chuva ou descansada.",
+      umidade:"Alta: 60% ou mais. Pontas marrons são o sinal clássico de ar seco.",
+      temperatura:"18–26 °C, sem correntes de ar frio ou quente.",
+      substrato:"Rico, que retém umidade mas drena: terra vegetal + fibra de coco + perlita.",
+      adubacao:"Adubo líquido com metade da dose, a cada 4 semanas na estação de crescimento. Sensíveis a excesso de sais.",
+      extra:"Umidificador, bandeja com pedrinhas e água ou agrupar plantas ajudam. Mantenha longe de aquecedores e ar-condicionado."
+    }},
+  { id:"suculentas", nome:"Suculentas e cactos", emoji:"🌵", color:"#E6DDB8", d:1, luzTipo:["sol"],
+    desc:"Armazenam água nas folhas ou no caule. Precisam de muita luz e pouca água; o erro mais comum é regar demais.",
+    care:{
+      luz:"Muita luz: 4 horas ou mais de sol direto, ou a janela mais clara da casa. Com pouca luz esticam e perdem a cor.",
+      rega:"Encharcar e deixar secar: regue bem só quando o substrato estiver totalmente seco. No inverno, bem pouco.",
+      umidade:"Baixa. O ar seco de casa é ótimo.",
+      temperatura:"15–30 °C no período de crescimento. Para a maioria, um inverno mais fresco (10–15 °C) é bem-vindo.",
+      substrato:"Muito drenante: substrato para cactos + 30–50% de areia grossa, pedrisco ou perlita. Vaso de barro ajuda.",
+      adubacao:"Adubo para cactos e suculentas (baixo nitrogênio), diluído, uma vez por mês na primavera e no verão.",
+      extra:"Aclimate ao sol direto aos poucos para evitar queimaduras. Excesso de água é a causa nº 1 de morte."
+    }},
+  { id:"resistentes", nome:"Resistentes à pouca luz", emoji:"🪴", color:"#D5DCC8", d:1, luzTipo:["sombra","meia"],
+    desc:"Aguentam pouca luz, ar seco e regas esquecidas. Boas para iniciantes e para cantos menos iluminados.",
+    care:{
+      luz:"Toleram luz baixa (crescem devagar), mas ficam mais bonitas com luz indireta média.",
+      rega:"Deixe o substrato secar bem entre as regas. Menos luz significa ainda menos água.",
+      umidade:"Indiferente; aguentam ar seco.",
+      temperatura:"16–28 °C. Não gostam de temperaturas abaixo de 10 °C.",
+      substrato:"Drenante: terra vegetal + perlita ou areia grossa.",
+      adubacao:"Pouca: a cada 1–2 meses na primavera e no verão.",
+      extra:"Ótimas para escritórios e cantos. O erro mais comum é regar demais."
+    }},
+  { id:"arvores", nome:"Árvores e arbustos de interior", emoji:"🌳", color:"#C8D8B4", d:2, luzTipo:["meia","sol"],
+    desc:"Plantas de porte maior que passam anos no mesmo vaso. Gostam de luz clara e de estabilidade.",
+    care:{
+      luz:"Luz clara perto da janela, com algumas horas de sol filtrado ou sol da manhã.",
+      rega:"Quando os 5 cm de cima estiverem secos. Vasos grandes secam devagar: confira com o dedo ou um palito.",
+      umidade:"Média (40–60%).",
+      temperatura:"16–27 °C, longe de correntes de ar.",
+      substrato:"Terra vegetal de boa qualidade + casca + perlita. Trocar de vaso a cada 2–3 anos.",
+      adubacao:"Adubo líquido equilibrado, uma vez por mês na primavera e no verão.",
+      extra:"Não gostam de mudar de lugar: é comum soltarem folhas depois de uma mudança. Gire o vaso aos poucos."
+    }},
+  { id:"ervas", nome:"Ervas e comestíveis de janela", emoji:"🌱", color:"#DCE8B0", d:2, luzTipo:["sol"],
+    desc:"Temperos e comestíveis que crescem rápido e precisam de muito sol para ter sabor e não esticar.",
+    care:{
+      luz:"Sol direto: 6 horas ou mais. Dentro de casa, a janela mais ensolarada ou uma luz de cultivo (LED).",
+      rega:"Substrato levemente úmido. Vasos pequenos secam rápido no verão.",
+      umidade:"Média.",
+      temperatura:"18–28 °C.",
+      substrato:"Terra vegetal rica + composto orgânico + perlita, em vaso com boa drenagem.",
+      adubacao:"Adubo orgânico ou líquido a cada 2–3 semanas, porque as colheitas constantes consomem nutrientes.",
+      extra:"Colher com frequência estimula a planta. Nas ervas de folha, retirar os botões florais prolonga a produção."
+    }},
+  { id:"floriferas", nome:"Floríferas de interior", emoji:"🌸", color:"#EBCFD6", d:2, luzTipo:["meia"],
+    desc:"Plantas cultivadas principalmente pelas flores. Florir exige mais luz e adubação própria.",
+    care:{
+      luz:"Luz indireta clara; um pouco de sol da manhã ajuda a florir.",
+      rega:"Quando a superfície secar. Evite molhar flores e folhas.",
+      umidade:"Média a alta.",
+      temperatura:"18–27 °C.",
+      substrato:"Varia bastante: veja cada planta.",
+      adubacao:"Adubo para floração (mais fósforo e potássio), diluído, a cada 2–4 semanas na fase de crescimento e floração.",
+      extra:"Pouca luz é o motivo mais comum para uma planta não florir."
+    }}
+];
+
+/* pet:true = tóxica para cães e gatos (referência: lista da ASPCA). ov = cuidados que diferem do grupo. p = problemas comuns */
+const SPECIES = [
+  // Folhagens tropicais
+  {id:"monstera",n:"Costela-de-adão",s:"Monstera deliciosa",g:"folhagens",pet:true,
+   ov:{luz:"Luz indireta clara. Com pouca luz, as folhas novas saem sem os recortes (fenestrações).",extra:"Raízes aéreas são normais. Um tutor de musgo ou fibra de coco ajuda a formar folhas maiores."},
+   p:["excesso_agua","falta_luz","cochonilha","acaro"]},
+  {id:"jiboia",n:"Jiboia",s:"Epipremnum aureum",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sombra"],luz:"Tolera bem pouca luz, mas cresce devagar e as variedades variegadas perdem as manchas claras."},
+   p:["excesso_agua","falta_luz","cochonilha"]},
+  {id:"filodendro",n:"Filodendro-cordatum",s:"Philodendron hederaceum",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sombra"],luz:"Aceita luz média a baixa; com pouca luz fica com espaços longos entre as folhas."},
+   p:["excesso_agua","falta_luz","ar_seco"]},
+  {id:"singonio",n:"Singônio",s:"Syngonium podophyllum",g:"folhagens",pet:true,
+   ov:{rega:"Gosta do substrato levemente úmido; não deixe secar por completo.",extra:"Com o tempo vira trepadeira. Pode podar para manter compacto."},
+   p:["falta_agua","ar_seco","acaro"]},
+  {id:"liriodapaz",n:"Lírio-da-paz",s:"Spathiphyllum wallisii",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sombra"],rega:"Prefere substrato sempre levemente úmido. Murcha visivelmente quando tem sede e se recupera poucas horas depois da rega.",extra:"Com pouca luz dificilmente floresce."},
+   p:["falta_agua","sais_agua","excesso_agua"]},
+
+  // Marantáceas e amantes de umidade
+  {id:"calathea",n:"Calathea",s:"Goeppertia spp.",g:"exigentes",pet:false,
+   ov:{extra:"As folhas se levantam e se fecham à noite, e isso é normal. Muito sensível a cloro e flúor na água."},
+   p:["ar_seco","sais_agua","acaro"]},
+  {id:"maranta",n:"Maranta (planta-rezadeira)",s:"Maranta leuconeura",g:"exigentes",pet:false,
+   ov:{extra:"Assim como a calathea, dobra as folhas à noite."},
+   p:["ar_seco","acaro","falta_agua"]},
+  {id:"samambaia",n:"Samambaia",s:"Nephrolepis exaltata",g:"exigentes",pet:false,d:2,
+   ov:{luzTipo:["meia"],rega:"Não deixe secar: substrato sempre úmido, sem encharcar. Folhinhas secas caindo indicam falta de água ou ar seco."},
+   p:["ar_seco","falta_agua","cochonilha"]},
+  {id:"fitonia",n:"Fitônia",s:"Fittonia albivenis",g:"exigentes",pet:false,d:2,
+   ov:{rega:"Desmaia (murcha por completo) quando o substrato seca e se recupera após a rega, mas desmaios repetidos enfraquecem a planta.",extra:"Fica ótima em terrários, onde a umidade é alta."},
+   p:["falta_agua","ar_seco","excesso_agua"]},
+
+  // Suculentas e cactos
+  {id:"echeveria",n:"Echevéria",s:"Echeveria spp.",g:"suculentas",pet:false,
+   ov:{extra:"Não molhe a roseta: água parada no centro pode apodrecer a planta."},
+   p:["excesso_agua","falta_luz","cochonilha","podridao_raiz"]},
+  {id:"haworthia",n:"Haworthia",s:"Haworthiopsis / Haworthia spp.",g:"suculentas",pet:false,
+   ov:{luzTipo:["meia"],luz:"Diferente da maioria das suculentas, prefere luz clara indireta. Sol forte deixa as folhas avermelhadas ou queimadas."},
+   p:["excesso_agua","queimadura_sol","cochonilha"]},
+  {id:"babosa",n:"Babosa",s:"Aloe vera",g:"suculentas",pet:true,
+   ov:{extra:"Folhas finas e curvadas indicam falta de água ou de luz; folhas moles e translúcidas, excesso de água."},
+   p:["excesso_agua","falta_luz","queimadura_sol"]},
+  {id:"jade",n:"Planta-jade",s:"Crassula ovata",g:"suculentas",pet:true,
+   ov:{extra:"Aceita podas e forma tronco com o tempo. Folhas enrugadas indicam que está na hora de regar."},
+   p:["excesso_agua","cochonilha","falta_luz"]},
+  {id:"mammillaria",n:"Cacto mammillaria",s:"Mammillaria spp.",g:"suculentas",pet:false,
+   ov:{rega:"Muito espaçada. No inverno, em local fresco, praticamente sem água.",extra:"Um inverno fresco e seco estimula a floração em coroa."},
+   p:["excesso_agua","podridao_raiz","cochonilha"]},
+  {id:"colar",n:"Colar-de-pérolas",s:"Curio rowleyanus",g:"suculentas",pet:true,d:2,
+   ov:{luzTipo:["meia","sol"],luz:"Luz clara com um pouco de sol suave; sol forte da tarde queima as pérolas.",rega:"Um pouco mais frequente que outras suculentas: regue quando as pérolas começarem a enrugar levemente.",extra:"Use vaso raso, pois as raízes são superficiais."},
+   p:["excesso_agua","podridao_raiz","falta_agua"]},
+
+  // Resistentes à pouca luz
+  {id:"zamioculca",n:"Zamioculca",s:"Zamioculcas zamiifolia",g:"resistentes",pet:true,
+   ov:{rega:"Armazena água nos rizomas: regue só com o substrato completamente seco (em geral a cada 2–4 semanas)."},
+   p:["excesso_agua","podridao_raiz","senescencia"]},
+  {id:"espada",n:"Espada-de-são-jorge",s:"Dracaena trifasciata",g:"resistentes",pet:true,
+   ov:{luzTipo:["sombra","meia","sol"],luz:"Vai da sombra ao sol direto; é uma das plantas mais tolerantes que existem.",rega:"Pouquíssima: a cada 2–4 semanas no verão e quase nada no inverno."},
+   p:["excesso_agua","podridao_raiz","frio"]},
+  {id:"aspidistra",n:"Aspidistra (planta-de-ferro)",s:"Aspidistra elatior",g:"resistentes",pet:false,
+   ov:{extra:"Aguenta frio, sombra e esquecimento. Cresce muito devagar."},
+   p:["queimadura_sol","excesso_agua","acaro"]},
+  {id:"aglaonema",n:"Aglaonema",s:"Aglaonema spp.",g:"resistentes",pet:true,
+   ov:{luz:"As variedades verdes toleram pouca luz; as coloridas (vermelhas, rosadas) precisam de luz indireta clara.",temperatura:"Sensível ao frio: mantenha acima de 15 °C."},
+   p:["frio","excesso_agua","cochonilha"]},
+  {id:"clorofito",n:"Clorofito (gravatinha)",s:"Chlorophytum comosum",g:"resistentes",pet:false,
+   ov:{luzTipo:["meia"],luz:"Luz indireta média a clara.",rega:"Um pouco mais regular que as outras do grupo. As raízes grossas guardam água.",extra:"Pontas marrons costumam vir de água muito tratada ou de excesso de sais. Os filhotes enraízam fácil na água."},
+   p:["sais_agua","ar_seco","excesso_adubo"]},
+
+  // Árvores e arbustos
+  {id:"lyrata",n:"Figueira-lira",s:"Ficus lyrata",g:"arvores",pet:true,d:3,
+   ov:{extra:"Muito sensível a mudanças de lugar e a correntes de ar: é comum derrubar folhas quando estressada. Escolha um lugar claro e deixe lá."},
+   p:["estresse_mudanca","excesso_agua","queimadura_sol"]},
+  {id:"elastica",n:"Falsa-seringueira",s:"Ficus elastica",g:"arvores",pet:true,
+   ov:{extra:"A seiva leitosa pode irritar a pele. Limpe as folhas largas com pano úmido."},
+   p:["estresse_mudanca","excesso_agua","cochonilha"]},
+  {id:"marginata",n:"Dracena-de-madagascar",s:"Dracaena marginata",g:"arvores",pet:true,d:1,
+   ov:{luzTipo:["meia","sombra"],rega:"Deixe secar mais entre as regas; tolera esquecimento melhor que excesso.",extra:"Pontas marrons são comuns com água rica em flúor ou sais."},
+   p:["sais_agua","excesso_agua","senescencia"]},
+  {id:"fragrans",n:"Pau-d'água",s:"Dracaena fragrans",g:"arvores",pet:true,d:1,
+   ov:{luzTipo:["meia","sombra"]},
+   p:["sais_agua","excesso_agua","cochonilha"]},
+  {id:"areca",n:"Palmeira-areca",s:"Dypsis lutescens",g:"arvores",pet:false,
+   ov:{rega:"Mantenha levemente úmida, sem encharcar.",umidade:"Gosta de umidade mais alta; ar seco causa pontas marrons.",extra:"Sensível a sais: prefira água filtrada ou de chuva."},
+   p:["ar_seco","acaro","sais_agua"]},
+  {id:"cheflera",n:"Cheflera",s:"Schefflera arboricola",g:"arvores",pet:true,d:1,
+   ov:{extra:"Aceita podas para ficar mais cheia."},
+   p:["acaro","cochonilha","estresse_mudanca"]},
+
+  // Ervas e comestíveis
+  {id:"manjericao",n:"Manjericão",s:"Ocimum basilicum",g:"ervas",pet:false,
+   ov:{temperatura:"Muito sensível ao frio: abaixo de 10–12 °C as folhas escurecem.",extra:"Belisque as pontas e retire os botões de flor para a planta ficar cheia e produzir por mais tempo."},
+   p:["frio","pulgao","falta_luz","falta_agua"]},
+  {id:"hortela",n:"Hortelã",s:"Mentha spp.",g:"ervas",pet:true,
+   ov:{luzTipo:["sol","meia"],luz:"Aceita meia-sombra melhor que outras ervas.",rega:"Gosta de mais água: não deixe o substrato secar.",extra:"Muito invasiva: plante sozinha, em vaso próprio."},
+   p:["falta_agua","oidio","pulgao"]},
+  {id:"alecrim",n:"Alecrim",s:"Salvia rosmarinus",g:"ervas",pet:false,
+   ov:{rega:"Deixe secar entre as regas: excesso de água é o que mais mata alecrim em vaso.",substrato:"Bem drenante, com areia grossa. Vaso de barro é ideal.",umidade:"Baixa; prefere ar seco e ventilado."},
+   p:["excesso_agua","oidio","falta_luz"]},
+  {id:"salsinha",n:"Salsinha",s:"Petroselinum crispum",g:"ervas",pet:true,
+   ov:{luzTipo:["sol","meia"],extra:"Tem raiz pivotante: prefere vaso fundo e não gosta de transplante."},
+   p:["pulgao","falta_agua","def_nitrogenio"]},
+  {id:"cebolinha",n:"Cebolinha",s:"Allium schoenoprasum",g:"ervas",pet:true,
+   ov:{extra:"Corte rente, deixando 3–5 cm; rebrota rápido."},
+   p:["falta_agua","pulgao","def_nitrogenio"]},
+  {id:"tomate",n:"Tomate-cereja",s:"Solanum lycopersicum",g:"ervas",pet:true,d:3,
+   ov:{rega:"Regular e constante: regas irregulares causam rachaduras e fundo preto nos frutos.",adubacao:"Depois da floração, use adubo com mais potássio (fórmulas para frutos).",extra:"Precisa de tutor e de vaso grande (pelo menos 15–20 L). Dentro de casa, sacuda levemente as flores para ajudar na polinização."},
+   p:["def_potassio","mosca_branca","oidio","acaro"]},
+
+  // Floríferas
+  {id:"orquidea",n:"Orquídea-borboleta",s:"Phalaenopsis spp.",g:"floriferas",pet:false,
+   ov:{substrato:"Casca de pinus com um pouco de musgo sphagnum, em vaso com furos laterais. Nunca terra comum.",rega:"Quando as raízes ficarem prateadas (verdes significa ainda úmidas): mergulhe o vaso por uns 10 minutos e deixe escorrer bem. Não deixe água no centro das folhas.",extra:"Noites uns 5 °C mais frias no outono ajudam a lançar uma nova haste floral."},
+   p:["podridao_raiz","cochonilha","mancha_foliar"]},
+  {id:"violeta",n:"Violeta-africana",s:"Saintpaulia ionantha",g:"floriferas",pet:false,
+   ov:{rega:"Pelo pratinho ou direto na terra, com água em temperatura ambiente. Água fria nas folhas deixa manchas claras.",substrato:"Leve e aerado, próprio para violetas."},
+   p:["excesso_agua","oidio","mancha_foliar"]},
+  {id:"anturio",n:"Antúrio",s:"Anthurium andraeanum",g:"floriferas",pet:true,
+   ov:{substrato:"Aerado, com casca de pinus e perlita.",umidade:"Alta. Umidificador ou bandeja com pedrinhas ajudam."},
+   p:["excesso_agua","ar_seco","cochonilha"]},
+  {id:"begonia",n:"Begônia",s:"Begonia spp.",g:"floriferas",pet:true,
+   ov:{rega:"Deixe secar a camada de cima; é sensível a encharcamento.",extra:"Evite molhar as folhas: é muito suscetível a oídio."},
+   p:["oidio","excesso_agua","mancha_foliar"]},
+  {id:"kalanchoe",n:"Calanchoê",s:"Kalanchoe blossfeldiana",g:"floriferas",pet:true,d:1,
+   ov:{luzTipo:["sol","meia"],luz:"Luz clara com algumas horas de sol.",rega:"Como uma suculenta: só quando o substrato secar.",substrato:"Drenante, igual ao de suculentas.",extra:"Para florir de novo precisa de cerca de 6 semanas de noites longas e escuras (14 h sem luz)."},
+   p:["excesso_agua","oidio","cochonilha"]},
+
+  /* ---------- Novas espécies ---------- */
+  // Folhagens tropicais
+  {id:"xanadu",n:"Filodendro-xanadu",s:"Thaumatophyllum xanadu",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sol"],luz:"Aceita luz clara e algumas horas de sol suave; com mais luz fica mais compacto."},
+   p:["excesso_agua","falta_luz","cochonilha"]},
+  {id:"guaimbe",n:"Guaimbê",s:"Thaumatophyllum bipinnatifidum",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sol"],luz:"Tolera sol da manhã e até sol pleno quando aclimatado; no Brasil é muito usado também em jardins.",extra:"Cresce bastante: precisa de vaso grande e espaço."},
+   p:["excesso_agua","cochonilha","queimadura_sol"]},
+  {id:"birkin",n:"Filodendro Birkin",s:"Philodendron 'Birkin'",g:"folhagens",pet:true,
+   ov:{luz:"Luz indireta clara é essencial para manter as listras brancas; com pouca luz as folhas novas saem mais verdes."},
+   p:["falta_luz","excesso_agua","acaro"]},
+  {id:"adansonii",n:"Costela-de-adão-mini",s:"Monstera adansonii",g:"folhagens",pet:true,
+   ov:{rega:"Um pouco mais frequente que a costela-de-adão: não deixe secar muito.",umidade:"Gosta de umidade mais alta; as folhas finas secam com ar seco."},
+   p:["ar_seco","acaro","excesso_agua"]},
+  {id:"scindapsus",n:"Jiboia-prateada",s:"Scindapsus pictus",g:"folhagens",pet:true,
+   ov:{rega:"Deixe secar um pouco mais que a jiboia comum; as folhas se enrolam quando tem sede."},
+   p:["excesso_agua","falta_agua","cochonilha"]},
+  {id:"comigo",n:"Comigo-ninguém-pode",s:"Dieffenbachia seguine",g:"folhagens",pet:true,
+   ov:{extra:"A seiva é bem irritante para pele, boca e olhos: use luvas na poda e mantenha longe de crianças e pets."},
+   p:["excesso_agua","frio","acaro"]},
+  {id:"lambari",n:"Lambari (tradescância)",s:"Tradescantia zebrina",g:"folhagens",pet:true,
+   ov:{luzTipo:["meia","sol"],luz:"Luz clara com um pouco de sol deixa as listras roxas e prateadas mais intensas; com pouca luz fica esticada e sem cor.",extra:"Pode podar à vontade: as estacas enraízam na água em poucos dias."},
+   p:["falta_luz","excesso_agua","acaro"]},
+  {id:"pilea",n:"Planta-chinesa-do-dinheiro",s:"Pilea peperomioides",g:"folhagens",pet:false,
+   ov:{luz:"Luz indireta clara. Gire o vaso toda semana, porque ela se inclina para a janela.",rega:"Deixe secar a metade de cima do substrato; as folhas ficam caídas quando tem sede."},
+   p:["excesso_agua","falta_luz","queimadura_sol"]},
+
+  // Marantáceas e amantes de umidade
+  {id:"alocasia",n:"Alocásia",s:"Alocasia × amazonica 'Polly'",g:"exigentes",pet:true,
+   ov:{luzTipo:["meia"],luz:"Luz indireta clara, sem sol direto.",extra:"Pode entrar em dormência no inverno e perder quase todas as folhas: reduza a rega e espere, porque ela rebrota do rizoma na primavera. Muito visada por ácaros."},
+   p:["acaro","excesso_agua","frio"]},
+  {id:"asplenio",n:"Asplênio (ninho-de-passarinho)",s:"Asplenium nidus",g:"exigentes",pet:false,d:2,
+   ov:{rega:"Regue na terra ao redor, não no centro da roseta, para não apodrecer o miolo."},
+   p:["ar_seco","excesso_agua","cochonilha"]},
+  {id:"avenca",n:"Avenca",s:"Adiantum raddianum",g:"exigentes",pet:false,
+   ov:{rega:"Não pode secar nem por um dia: substrato sempre úmido, sem encharcar.",extra:"Se secar por completo, corte tudo rente ao substrato e continue regando; costuma rebrotar."},
+   p:["falta_agua","ar_seco","excesso_agua"]},
+  {id:"unhadegato",n:"Unha-de-gato (falsa-hera)",s:"Ficus pumila",g:"exigentes",pet:true,d:2,
+   ov:{rega:"Mantenha levemente úmida: seca rápido e as folhinhas ficam crocantes.",extra:"Trepadeira que gruda em paredes e tutores; também fica bonita pendente."},
+   p:["falta_agua","ar_seco","acaro"]},
+  {id:"aspargo",n:"Aspargo-samambaia",s:"Asparagus setaceus",g:"exigentes",pet:true,d:2,
+   ov:{luzTipo:["meia"],extra:"Apesar do nome, não é samambaia. Tem pequenos espinhos nos ramos."},
+   p:["falta_agua","ar_seco","cochonilha"]},
+
+  // Suculentas e cactos
+  {id:"pataelefante",n:"Pata-de-elefante",s:"Beaucarnea recurvata",g:"suculentas",pet:false,
+   ov:{extra:"Guarda água na base do tronco e aguenta semanas sem rega. Pontas secas nas folhas longas são comuns."},
+   p:["excesso_agua","podridao_raiz","sais_agua"]},
+  {id:"raboburro",n:"Rabo-de-burro",s:"Sedum morganianum",g:"suculentas",pet:false,
+   ov:{luzTipo:["sol","meia"],extra:"As folhinhas soltam com qualquer toque: escolha um lugar onde não precise mexer. Cada folha caída vira muda."},
+   p:["excesso_agua","falta_luz","cochonilha"]},
+  {id:"ripsalis",n:"Ripsális (cacto-macarrão)",s:"Rhipsalis baccifera",g:"suculentas",pet:false,
+   ov:{luzTipo:["meia"],luz:"Cacto de floresta: luz clara indireta, sem sol forte.",rega:"Mais frequente que um cacto comum: quando a camada de cima secar.",umidade:"Gosta de umidade média a alta.",substrato:"Leve e aerado, com casca de pinus."},
+   p:["excesso_agua","queimadura_sol","cochonilha"]},
+
+  // Resistentes à pouca luz
+  {id:"peperomia",n:"Peperômia",s:"Peperomia obtusifolia",g:"resistentes",pet:false,
+   ov:{luzTipo:["meia"],rega:"As folhas carnudas guardam água: deixe secar bem entre as regas.",extra:"Raízes pequenas: prefere vaso pequeno e raso."},
+   p:["excesso_agua","podridao_raiz","falta_luz"]},
+  {id:"camedorea",n:"Palmeira-de-salão",s:"Chamaedorea elegans",g:"resistentes",pet:false,
+   ov:{rega:"Um pouco mais regular que as outras do grupo: regue quando os 2–3 cm de cima secarem.",extra:"Uma das poucas palmeiras que aceitam pouca luz. Ácaros aparecem com ar seco."},
+   p:["acaro","ar_seco","excesso_agua"]},
+
+  // Árvores e arbustos (Ficus e outras)
+  {id:"benjamina",n:"Figueira-benjamina",s:"Ficus benjamina",g:"arvores",pet:true,d:3,
+   ov:{extra:"Famosa por derrubar folhas com qualquer mudança de luz, temperatura ou corrente de ar. Depois de encontrar um bom lugar, não mude."},
+   p:["estresse_mudanca","cochonilha","acaro"]},
+  {id:"ginseng",n:"Ficus ginseng",s:"Ficus microcarpa 'Ginseng'",g:"arvores",pet:true,
+   ov:{luzTipo:["meia","sol"],luz:"Luz clara; aceita algumas horas de sol direto.",extra:"Vendido como bonsai de interior e aceita poda de formação. As raízes grossas guardam água, então não exagere na rega."},
+   p:["estresse_mudanca","excesso_agua","cochonilha"]},
+  {id:"audrey",n:"Ficus Audrey",s:"Ficus benghalensis 'Audrey'",g:"arvores",pet:true,
+   ov:{extra:"Parecido com a figueira-lira, porém mais tolerante a variações e a regas esquecidas."},
+   p:["estresse_mudanca","excesso_agua","cochonilha"]},
+  {id:"alii",n:"Ficus Alii",s:"Ficus binnendijkii 'Alii'",g:"arvores",pet:true,
+   ov:{extra:"Folhas finas e alongadas. Tolera mudanças de lugar melhor que a benjamina, mas também solta folhas quando estressado."},
+   p:["estresse_mudanca","acaro","cochonilha"]},
+  {id:"triangular",n:"Ficus triangular",s:"Ficus triangularis",g:"arvores",pet:true,
+   ov:{luzTipo:["meia"],extra:"Cresce devagar e fica compacto; bom para mesas e prateleiras claras."},
+   p:["estresse_mudanca","excesso_agua","acaro"]},
+  {id:"rafis",n:"Palmeira-ráfis",s:"Rhapis excelsa",g:"arvores",pet:false,d:1,
+   ov:{luzTipo:["meia","sombra"],luz:"Tolera luz média a baixa melhor que a areca.",extra:"Cresce devagar. Pontas marrons costumam vir de sais na água."},
+   p:["sais_agua","cochonilha","excesso_agua"]},
+  {id:"iuca",n:"Iúca",s:"Yucca elephantipes",g:"arvores",pet:true,d:1,
+   ov:{luzTipo:["sol","meia"],luz:"Precisa de muita luz, com sol direto; com pouca luz fica fraca e inclinada.",rega:"Deixe secar bem entre as regas: tolera seca, não tolera encharcamento.",substrato:"Drenante, com areia grossa."},
+   p:["excesso_agua","falta_luz","podridao_raiz"]},
+
+  // Ervas e comestíveis
+  {id:"coentro",n:"Coentro",s:"Coriandrum sativum",g:"ervas",pet:false,
+   ov:{luzTipo:["sol","meia"],temperatura:"Prefere clima ameno (15–24 °C): no calor floresce rápido e para de produzir folhas.",extra:"Semeie de novo a cada 3–4 semanas para ter sempre folhas novas. Não gosta de transplante."},
+   p:["falta_agua","pulgao","def_nitrogenio"]},
+  {id:"tomilho",n:"Tomilho",s:"Thymus vulgaris",g:"ervas",pet:false,
+   ov:{rega:"Deixe secar entre as regas; como o alecrim, sofre com excesso de água.",substrato:"Bem drenante, com areia grossa.",umidade:"Baixa."},
+   p:["excesso_agua","falta_luz","oidio"]},
+  {id:"oregano",n:"Orégano",s:"Origanum vulgare",g:"ervas",pet:true,
+   ov:{rega:"Deixe secar a camada de cima; tolera secas curtas.",extra:"O sabor fica mais intenso com mais sol e menos adubo."},
+   p:["excesso_agua","falta_luz","pulgao"]},
+
+  // Floríferas
+  {id:"floremaio",n:"Flor-de-maio",s:"Schlumbergera truncata",g:"floriferas",pet:false,
+   ov:{luz:"Luz indireta clara; é um cacto de floresta e não gosta de sol forte.",rega:"Quando a camada de cima secar; um pouco mais de água na época dos botões.",substrato:"Leve e aerado, com casca de pinus.",extra:"Floresce com noites longas e frescas no outono. Não mude de lugar quando estiver com botões, porque eles caem."},
+   p:["excesso_agua","estresse_mudanca","cochonilha"]},
+  {id:"bromelia",n:"Bromélia (guzmânia)",s:"Guzmania spp.",g:"floriferas",pet:false,
+   ov:{rega:"Mantenha um pouco de água no copo central (troque a cada 1–2 semanas) e o substrato só levemente úmido.",substrato:"Muito aerado: casca de pinus e fibra de coco.",extra:"Floresce uma vez e depois morre aos poucos, mas solta filhotes na base que podem ser replantados."},
+   p:["podridao_raiz","excesso_agua","sais_agua"]},
+  {id:"ciclamen",n:"Ciclâmen",s:"Cyclamen persicum",g:"floriferas",pet:true,d:3,
+   ov:{temperatura:"Gosta de frio: 10–18 °C. Em ambiente aquecido as flores duram pouco.",rega:"Por baixo, deixando o vaso no prato com água por uns 20 minutos, sem molhar o tubérculo no centro.",extra:"Planta de inverno. Depois da floração entra em dormência no verão."},
+   p:["excesso_agua","podridao_raiz","acaro"]},
+  {id:"poinsetia",n:"Poinsétia (bico-de-papagaio)",s:"Euphorbia pulcherrima",g:"floriferas",pet:true,d:3,
+   ov:{temperatura:"18–22 °C, sem correntes de ar frio. Sofre com frio já no transporte da loja.",rega:"Quando a superfície secar; é sensível tanto à seca quanto ao encharcamento.",extra:"As 'flores' vermelhas são folhas (brácteas). Para colorir de novo precisa de cerca de 8 semanas de noites com 14 h de escuro total no outono. A seiva leitosa irrita a pele."},
+   p:["estresse_mudanca","excesso_agua","mosca_branca"]},
+  {id:"clivia",n:"Clívia",s:"Clivia miniata",g:"floriferas",pet:true,
+   ov:{luzTipo:["meia","sombra"],rega:"Deixe secar bem entre as regas.",extra:"Para florir, precisa de um período fresco e seco no inverno (cerca de 10–12 °C e pouca água por 6–8 semanas). Gosta de vaso apertado."},
+   p:["excesso_agua","cochonilha","queimadura_sol"]},
+  {id:"hoya",n:"Flor-de-cera",s:"Hoya carnosa",g:"floriferas",pet:false,
+   ov:{rega:"As folhas carnudas guardam água: deixe secar entre as regas.",substrato:"Aerado: casca de pinus, perlita e pouca terra.",extra:"Não corte as hastes secas de onde saíram flores, porque ela floresce de novo no mesmo lugar."},
+   p:["excesso_agua","cochonilha","falta_luz"]}
+];
+
+/* sintomas que o usuário marca */
+const LOC = [["loc_novas","Folhas novas ou pontas"],["loc_velhas","Folhas velhas, de baixo"],["loc_toda","Planta toda"],["loc_caule","Caule ou base"],["loc_solo","Substrato ou vaso"]];
+const LOOK = [
+  {t:"Cor e manchas",items:[
+    ["amarelado","Folhas amarelando"],["interveinal","Amarelo entre as nervuras (nervuras verdes)"],["poucas_folhas_velhas","Só 1–2 folhas de baixo amarelando"],
+    ["pontas","Pontas ou bordas marrons e secas"],["halo","Manchas com halo amarelado"],["manchas_moles","Manchas escuras e moles"],
+    ["escuras_translucidas","Folhas escurecidas ou translúcidas"],["queimado","Áreas desbotadas ou queimadas do lado do sol"],["perde_variegacao","Perdendo a variegação ou a cor"]]},
+  {t:"Pragas e sinais",items:[
+    ["po_branco","Pó branco sobre as folhas"],["pontilhado","Folha pontilhada de pontinhos claros"],["prateado","Manchas prateadas com pontinhos pretos"],
+    ["teia","Teias finas"],["algodao","Bolinhas brancas tipo algodão ou carapaças"],["grudento","Folhas grudentas ou meladas"],
+    ["bichinhos_brotos","Bichinhos verdes ou pretos nos brotos"],["mosquinhas_brancas","Mosquinhas brancas voam ao mexer"]]},
+  {t:"Forma e crescimento",items:[
+    ["murcha","Planta murcha ou caída"],["crocante","Folhas enroladas ou crocantes"],["esticada","Caules esticados, folhas pequenas e pálidas"],
+    ["deformadas","Folhas novas deformadas"],["lento","Crescimento parado"],["caindo","Folhas caindo"],["base_mole","Base do caule escura ou mole"]]},
+  {t:"No substrato",items:[
+    ["mosquitos_solo","Mosquitinhos pretos no substrato"],["crosta","Crosta branca no substrato ou no vaso"],["mofo_solo","Mofo branco na superfície"],["cheiro","Cheiro de podre no substrato"]]}
+];
+const SOLO = [["solo_encharcado","Úmido ou encharcado há dias"],["solo_ok","Úmido, normal"],["solo_seco","Seco e duro"],["solo_ns","Não sei"]];
+const CTX = [["ctx_mudou","Mudou de lugar"],["ctx_replantou","Troquei de vaso"],["ctx_regou","Reguei bastante"],["ctx_adubou","Adubei há pouco"],["ctx_semadubo","Não aduba há meses"],["ctx_aquecedor","Perto de aquecedor ou ar-condicionado"],["ctx_sol","Pega sol direto forte"],["ctx_escuro","Fica num canto escuro"],["ctx_frio","Pegou frio ou vento"]];
+
+const PROBLEMS = [
+  {id:"excesso_agua",nome:"Excesso de água",cat:"Água",sev:2,ill:"yellow",
+   resumo:"Substrato úmido demais por muito tempo deixa as raízes sem oxigênio. É a causa mais comum de problemas em plantas de casa.",
+   confirmar:"Enfie o dedo ou um palito 3–5 cm no substrato. Se sair úmido vários dias depois da rega e as folhas amarelam moles (não secas), é um forte indício.",
+   solucao:["Pare de regar até os primeiros centímetros secarem.","Esvazie o pratinho e confirme que o vaso tem furo.","Leve para um lugar mais claro e ventilado para acelerar a secagem.","Se não secar em uma semana ou houver cheiro ruim, verifique as raízes (veja Podridão de raiz)."],
+   prevencao:"Regue pela necessidade (teste do dedo), não pelo calendário. Use substrato aerado e um vaso do tamanho certo.",
+   tags:{amarelado:2,murcha:1,caindo:1,loc_velhas:1,loc_toda:1,solo_encharcado:3,ctx_regou:2,mosquitos_solo:1,ctx_escuro:1}},
+  {id:"podridao_raiz",nome:"Podridão de raiz",cat:"Doenças",sev:3,ill:"rot",
+   resumo:"Fungos atacam raízes que ficaram encharcadas por muito tempo. A planta murcha mesmo com o substrato úmido.",
+   confirmar:"Tire a planta do vaso. Raízes saudáveis são firmes e claras; as podres ficam marrons ou pretas, moles, e a casca solta ao puxar.",
+   solucao:["Retire a planta e lave as raízes.","Corte com tesoura limpa todas as partes moles e escuras.","Replante em substrato novo e seco, em vaso limpo com furo (pode ser menor).","Regue só depois de alguns dias, com moderação.","Se o caule também estiver podre, faça estacas das partes saudáveis."],
+   prevencao:"Substrato drenante, vaso com furo e rega só quando a planta precisa.",
+   tags:{base_mole:3,cheiro:3,solo_encharcado:2,murcha:2,manchas_moles:1,loc_caule:2,loc_solo:2,amarelado:1}},
+  {id:"falta_agua",nome:"Falta de água",cat:"Água",sev:1,ill:"droop",
+   resumo:"A planta perde mais água do que consegue repor. Costuma se recuperar em poucas horas depois da rega.",
+   confirmar:"Substrato seco e duro, vaso leve; às vezes a terra descola da borda do vaso.",
+   solucao:["Regue devagar até escorrer pelo furo.","Se a água escorrer pela lateral sem molhar a terra, deixe o vaso de molho 15–20 minutos numa bacia.","Remova folhas que secaram por completo.","Revise a frequência de rega; no verão pode precisar dobrar."],
+   prevencao:"Confira o substrato com mais frequência nos dias quentes e em vasos pequenos.",
+   tags:{murcha:2,solo_seco:3,crocante:2,pontas:1,caindo:1,loc_toda:1}},
+  {id:"ar_seco",nome:"Ar seco (umidade baixa)",cat:"Luz e ambiente",sev:1,ill:"tips",
+   resumo:"Em ambientes com aquecimento ou ar-condicionado, as folhas perdem água mais rápido do que repõem e as pontas secam.",
+   confirmar:"Pontas marrons e secas em várias folhas, mesmo com a rega correta. Piora no inverno com o aquecimento ligado.",
+   solucao:["Afaste de aquecedores, radiadores e saídas de ar.","Aumente a umidade: umidificador, bandeja com pedrinhas e água ou plantas agrupadas.","Se quiser, apare as pontas secas acompanhando o formato da folha, deixando uma margem fina marrom."],
+   prevencao:"Para plantas exigentes (calatheas, samambaias), um higrômetro ajuda a manter 50–60% ou mais.",
+   tags:{pontas:3,crocante:1,ctx_aquecedor:2,ctx_frio:1,loc_toda:1}},
+  {id:"sais_agua",nome:"Acúmulo de sais ou água tratada",cat:"Água",sev:1,ill:"crust",
+   resumo:"Água calcária, cloro, flúor e resíduos de adubo se acumulam no substrato e queimam as pontas das folhas.",
+   confirmar:"Crosta branca na superfície do substrato ou na borda do vaso, junto com pontas marrons.",
+   solucao:["Lave o substrato: despeje bastante água (3–4 vezes o volume do vaso) e deixe escorrer.","Raspe a crosta da superfície e reponha com substrato novo.","Para plantas sensíveis, use água filtrada ou de chuva.","Reduza a dose de adubo."],
+   prevencao:"A cada poucos meses, lave o substrato com uma rega bem abundante.",
+   tags:{pontas:2,crosta:3,ctx_adubou:1,loc_velhas:1,loc_solo:1}},
+  {id:"excesso_adubo",nome:"Excesso de adubo",cat:"Nutrientes",sev:2,ill:"tips",
+   resumo:"Concentração alta de sais no substrato queima as raízes, e a planta mostra bordas queimadas e murcha.",
+   confirmar:"Os sintomas aparecem logo depois de adubar, principalmente com dose cheia ou adubo aplicado em substrato seco.",
+   solucao:["Lave o substrato com bastante água (várias vezes o volume do vaso).","Suspenda a adubação por 4–6 semanas.","Depois, volte com metade da dose recomendada.","Nunca adube com o substrato seco: regue antes."],
+   prevencao:"Menos é mais: dose diluída com mais frequência é mais segura do que dose cheia.",
+   tags:{ctx_adubou:3,pontas:2,crosta:1,murcha:1,deformadas:1,amarelado:1}},
+  {id:"falta_luz",nome:"Falta de luz",cat:"Luz e ambiente",sev:1,ill:"stretch",
+   resumo:"Sem luz suficiente a planta estica em busca de claridade, perde cor e cresce fraca.",
+   confirmar:"Espaços longos entre as folhas, folhas novas menores e pálidas, planta inclinada para a janela. Suculentas ficam esticadas e verdes.",
+   solucao:["Aproxime da janela ou mude para um lugar mais claro, aos poucos.","Considere uma luz de cultivo LED (8–12 h por dia).","Depois que a luz melhorar, pode podar as partes esticadas; em suculentas, as pontas viram mudas.","Regue menos enquanto a luz estiver baixa."],
+   prevencao:"Escolha a planta pela luz que o lugar tem, não o contrário.",
+   tags:{esticada:3,perde_variegacao:2,lento:1,caindo:1,ctx_escuro:3,amarelado:1,loc_velhas:1}},
+  {id:"queimadura_sol",nome:"Queimadura de sol",cat:"Luz e ambiente",sev:1,ill:"scorch",
+   resumo:"Exposição repentina ao sol forte destrói o tecido da folha, deixando áreas claras ou marrons.",
+   confirmar:"Manchas claras, esbranquiçadas ou marrons e secas só nas folhas voltadas para o sol, geralmente depois de mudar a planta de lugar.",
+   solucao:["Afaste do sol direto ou filtre com uma cortina fina.","As áreas queimadas não se recuperam; corte as folhas muito danificadas.","Para levar ao sol, aclimate aos poucos ao longo de 1–2 semanas."],
+   prevencao:"Toda mudança para mais luz deve ser gradual, inclusive para suculentas.",
+   tags:{queimado:3,ctx_sol:2,ctx_mudou:2,crocante:1}},
+  {id:"estresse_mudanca",nome:"Estresse por mudança",cat:"Luz e ambiente",sev:1,ill:"drop",
+   resumo:"Mudar de lugar, de vaso ou chegar da loja muda luz, temperatura e umidade de uma vez. A planta reage soltando folhas.",
+   confirmar:"Folhas caem ou amarelam alguns dias depois de uma mudança. Ficus são famosos por isso.",
+   solucao:["Mantenha a planta num lugar fixo, com boa luz e sem correntes de ar.","Não adube nem troque de vaso de novo por algumas semanas.","Regue normalmente, sem exagero: com menos folhas, ela bebe menos.","Tenha paciência: a recuperação leva de 2 a 6 semanas."],
+   prevencao:"Escolha o lugar definitivo antes e evite mudanças no inverno.",
+   tags:{caindo:3,ctx_mudou:3,ctx_replantou:3,murcha:1,amarelado:1}},
+  {id:"frio",nome:"Dano por frio",cat:"Luz e ambiente",sev:2,ill:"cold",
+   resumo:"Plantas tropicais sofrem com temperaturas abaixo de 10–12 °C, com correntes de ar frio e com o contato com o vidro gelado.",
+   confirmar:"Folhas escurecem, ficam translúcidas ou moles pouco depois de frio intenso: janela aberta no inverno, folhas encostadas no vidro, transporte no frio.",
+   solucao:["Leve para um local mais quente (acima de 15 °C), longe de vidro frio e de correntes de ar.","Espere alguns dias antes de cortar e remova só o que ficar claramente morto.","Regue pouco até a planta voltar a crescer."],
+   prevencao:"No inverno, afaste as plantas do vidro das janelas e cuidado ao ventilar o ambiente.",
+   tags:{escuras_translucidas:3,ctx_frio:3,murcha:1,manchas_moles:1}},
+  {id:"def_nitrogenio",nome:"Falta de nitrogênio",cat:"Nutrientes",sev:1,ill:"yellow",
+   resumo:"O nitrogênio é móvel na planta: quando falta, ela o retira das folhas velhas para alimentar as novas.",
+   confirmar:"Amarelamento uniforme e pálido começando pelas folhas mais velhas, com crescimento lento. Comum em plantas há muito tempo no mesmo substrato, sem adubo.",
+   solucao:["Adube com fertilizante equilibrado ou rico em nitrogênio, na dose do rótulo.","Se o substrato tem mais de 2 anos, troque por um novo.","As folhas muito amarelas não voltam a ficar verdes; as novas virão saudáveis."],
+   prevencao:"Adubação regular na primavera e no verão.",
+   tags:{amarelado:2,loc_velhas:3,lento:2,ctx_semadubo:2}},
+  {id:"def_magnesio",nome:"Falta de magnésio",cat:"Nutrientes",sev:1,ill:"interveinal",
+   resumo:"O magnésio faz parte da clorofila e é móvel: a falta aparece primeiro nas folhas velhas, entre as nervuras.",
+   confirmar:"Amarelo entre as nervuras, que continuam verdes, nas folhas mais velhas.",
+   solucao:["Use um adubo completo com micronutrientes que inclua magnésio.","Solução rápida: sulfato de magnésio (sal de Epsom), 1 colher de chá por litro, aplicado uma vez na rega.","Excesso de potássio atrapalha a absorção de magnésio: revise a fórmula do adubo."],
+   prevencao:"Prefira adubos com micronutrientes, principalmente se usar água filtrada ou de osmose.",
+   tags:{interveinal:3,loc_velhas:3,ctx_semadubo:1}},
+  {id:"def_ferro",nome:"Falta de ferro",cat:"Nutrientes",sev:1,ill:"interveinal",
+   resumo:"O ferro é imóvel: a falta aparece nas folhas novas. Muitas vezes ele existe no substrato, mas o pH alto impede a absorção.",
+   confirmar:"Amarelo entre as nervuras nas folhas novas, às vezes quase brancas. Comum com água muito calcária.",
+   solucao:["Aplique quelato de ferro conforme o rótulo, na rega ou nas folhas.","Use água menos calcária (chuva ou filtrada).","Adube com fórmula que contenha micronutrientes."],
+   prevencao:"Evite água muito calcária em plantas sensíveis e troque o substrato periodicamente.",
+   tags:{interveinal:3,loc_novas:3,crosta:1}},
+  {id:"def_potassio",nome:"Falta de potássio",cat:"Nutrientes",sev:1,ill:"tips",
+   resumo:"O potássio regula a água e a formação de frutos e flores. A falta aparece nas bordas das folhas velhas.",
+   confirmar:"As bordas das folhas mais velhas amarelam e depois ficam marrons e secas. Comum em tomate e plantas em floração.",
+   solucao:["Use adubo com mais potássio (o K do NPK), como fórmulas para floração e frutificação.","Mantenha a adubação regular na fase de crescimento.","Remova as folhas muito danificadas."],
+   prevencao:"Troque para adubo de floração quando a planta começar a florir.",
+   tags:{pontas:2,loc_velhas:2,amarelado:1,ctx_semadubo:1}},
+  {id:"acaro",nome:"Ácaro-rajado",cat:"Pragas",sev:2,ill:"stipple",
+   resumo:"Aracnídeos minúsculos que sugam a seiva pelo verso das folhas. Proliferam rápido em ar quente e seco.",
+   confirmar:"Passe um papel branco no verso das folhas: pontinhos que se mexem ou riscos avermelhados ao esfregar indicam ácaros.",
+   solucao:["Isole a planta das outras.","Dê um banho forte de chuveiro, principalmente no verso das folhas.","Aplique sabão potássico ou óleo de neem a cada 5–7 dias por 3–4 semanas, porque os ovos eclodem depois.","Aumente a umidade ao redor da planta.","Em infestações pesadas, pode podar as partes mais atacadas."],
+   prevencao:"Inspecione o verso das folhas regularmente, principalmente no inverno.",
+   tags:{pontilhado:3,teia:3,ctx_aquecedor:1,crocante:1,amarelado:1}},
+  {id:"cochonilha",nome:"Cochonilha",cat:"Pragas",sev:2,ill:"mealy",
+   resumo:"Insetos que se fixam nas axilas das folhas e no caule, sugam a seiva e soltam uma substância melada.",
+   confirmar:"Bolinhas brancas tipo algodão nas axilas e nervuras, ou pequenas carapaças marrons presas no caule.",
+   solucao:["Isole a planta.","Remova manualmente com cotonete embebido em álcool 70%.","Pulverize sabão potássico ou óleo de neem uma vez por semana, por algumas semanas.","Verifique também o substrato: algumas espécies atacam as raízes."],
+   prevencao:"Inspecione plantas novas antes de juntar com as outras.",
+   tags:{algodao:3,grudento:2,amarelado:1,lento:1}},
+  {id:"pulgao",nome:"Pulgão",cat:"Pragas",sev:1,ill:"aphids",
+   resumo:"Pequenos insetos que vivem em colônias nos brotos e deformam as folhas novas.",
+   confirmar:"Colônias de insetos verdes, pretos ou amarelos concentradas nos brotos e no verso das folhas novas.",
+   solucao:["Remova com jato de água ou passe os dedos ou um pano.","Aplique sabão potássico ou óleo de neem a cada 5–7 dias.","Evite excesso de adubo nitrogenado, que gera brotos tenros que atraem pulgões."],
+   prevencao:"Inspecione os brotos semanalmente na primavera.",
+   tags:{bichinhos_brotos:3,deformadas:2,grudento:2,loc_novas:2}},
+  {id:"tripes",nome:"Tripes",cat:"Pragas",sev:2,ill:"silver",
+   resumo:"Insetos finos e alongados que raspam a superfície das folhas e deixam manchas prateadas.",
+   confirmar:"Manchas prateadas com pontinhos pretos (fezes). Com lupa, dá para ver os insetos alongados.",
+   solucao:["Isole a planta e lave bem as folhas.","Aplique sabão potássico ou óleo de neem semanalmente por pelo menos 4 semanas.","Armadilhas adesivas azuis ou amarelas ajudam a monitorar e capturar adultos.","Troque a camada de cima do substrato, onde ficam as pupas."],
+   prevencao:"Quarentena de 2 semanas para plantas novas.",
+   tags:{prateado:3,pontilhado:1,deformadas:1,loc_novas:1}},
+  {id:"mosca_branca",nome:"Mosca-branca",cat:"Pragas",sev:2,ill:"whitefly",
+   resumo:"Pequenos insetos brancos que vivem no verso das folhas e voam em nuvem quando a planta é mexida.",
+   confirmar:"Ao sacudir a planta, sai uma nuvem de mosquinhas brancas bem pequenas. Ovos e ninfas ficam no verso das folhas.",
+   solucao:["Coloque armadilhas adesivas amarelas perto da planta.","Lave o verso das folhas e aplique sabão potássico ou óleo de neem a cada 5–7 dias.","Isole a planta e verifique as vizinhas."],
+   prevencao:"Atenção especial com tomates e ervas perto da janela no verão.",
+   tags:{mosquinhas_brancas:3,grudento:2,amarelado:1}},
+  {id:"mosquito_fungo",nome:"Mosquitinho-do-fungo",cat:"Pragas",sev:1,ill:"gnats",
+   resumo:"Os adultos são inofensivos, mas as larvas vivem no substrato úmido e podem danificar raízes de mudas.",
+   confirmar:"Mosquitinhos pretos voando rente ao substrato, principalmente depois da rega.",
+   solucao:["Deixe a camada de cima do substrato secar bem entre as regas.","Use armadilhas adesivas amarelas para os adultos.","Cubra o substrato com 1–2 cm de areia ou pedrisco.","Em casos persistentes: BTI (Bacillus thuringiensis israelensis) na água de rega ou nematoides Steinernema feltiae."],
+   prevencao:"Evite manter o substrato constantemente úmido.",
+   tags:{mosquitos_solo:3,solo_encharcado:2,ctx_regou:1,mofo_solo:1,loc_solo:1}},
+  {id:"oidio",nome:"Oídio",cat:"Doenças",sev:2,ill:"powder",
+   resumo:"Fungo que forma um pó branco nas folhas. Favorecido por pouca ventilação e folhas molhadas.",
+   confirmar:"Pó branco acinzentado que sai ao passar o dedo e volta a aparecer dias depois (diferente de poeira).",
+   solucao:["Remova as folhas mais atacadas.","Melhore a ventilação e evite molhar as folhas.","Pulverize bicarbonato de sódio (1 colher de chá por litro + gotas de sabão neutro) ou fungicida à base de enxofre.","Repita semanalmente até parar de aparecer."],
+   prevencao:"Espaço entre as plantas e rega direto na terra.",
+   tags:{po_branco:3,deformadas:1,amarelado:1}},
+  {id:"mancha_foliar",nome:"Manchas foliares (fungo ou bactéria)",cat:"Doenças",sev:2,ill:"halo",
+   resumo:"Infecções que aparecem quando as folhas ficam molhadas por muito tempo, com pouca ventilação.",
+   confirmar:"Manchas marrons ou pretas, às vezes com halo amarelo ao redor, que aumentam e podem se juntar.",
+   solucao:["Corte as folhas afetadas com tesoura limpa (desinfete com álcool entre os cortes) e descarte no lixo.","Regue na terra, sem molhar as folhas.","Aumente a ventilação e o espaço entre as plantas.","Em casos persistentes, use fungicida à base de cobre, seguindo o rótulo."],
+   prevencao:"Folhas secas e boa circulação de ar.",
+   tags:{halo:3,manchas_moles:2,amarelado:1}},
+  {id:"mofo_solo",nome:"Mofo no substrato",cat:"Doenças",sev:1,ill:"mold",
+   resumo:"Camada branca na superfície do substrato. Em geral é inofensiva, mas indica umidade demais e pouca ventilação.",
+   confirmar:"Camada branca e felpuda só na superfície do substrato, sem sintomas na planta.",
+   solucao:["Raspe a camada de cima e descarte.","Deixe o substrato secar mais entre as regas e melhore a circulação de ar.","Canela em pó polvilhada na superfície é um remédio caseiro usado para inibir o mofo."],
+   prevencao:"Regue menos em épocas frias e com pouca luz.",
+   tags:{mofo_solo:3,solo_encharcado:1,loc_solo:1}},
+  {id:"senescencia",nome:"Envelhecimento natural",cat:"Luz e ambiente",sev:1,ill:"yellow",
+   resumo:"Toda planta renova as folhas. As mais velhas amarelam e caem de vez em quando, e isso é normal.",
+   confirmar:"Só uma ou duas folhas de baixo amarelam de vez em quando, enquanto a planta continua soltando folhas novas saudáveis.",
+   solucao:["Nada a fazer: é normal.","Remova a folha quando estiver toda amarela ou seca."],
+   prevencao:"Nenhuma necessária.",
+   tags:{poucas_folhas_velhas:4,loc_velhas:2,amarelado:1}}
+];
+
+/* ============================================================
+   ILUSTRAÇÕES (SVG gerado) — padrão visual de cada sintoma
+   ============================================================ */
+let UID = 0;
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const LEAF = "M60 8 C 98 24, 102 78, 60 112 C 18 78, 22 24, 60 8 Z";
+const GR = "#4E8B3A", GRD = "#2F5A24", VN = "#94C46F";
+const f1 = n => n.toFixed(1);
+function veins(c,w,op=1){
+  let s = `<g stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" opacity="${op}"><path d="M60 12 L60 110"/>`;
+  for(let i=0;i<6;i++){const y=28+i*14,dx=34-i*3;
+    s+=`<path d="M60 ${y} Q ${f1(60+dx*.55)} ${y-3} ${60+dx} ${y-16}"/><path d="M60 ${y} Q ${f1(60-dx*.55)} ${y-3} ${60-dx} ${y-16}"/>`;}
+  return s+"</g>";
+}
+function leafSvg({fill=GR,vein=VN,vw=1.6,under="",over="",outside="",defs=""}={}){
+  const id="l"+(++UID);
+  const d=defs.split("§").join(id), fl=fill.split("§").join(id);
+  return `<svg viewBox="0 0 120 120" aria-hidden="true"><defs><clipPath id="${id}"><path d="${LEAF}"/></clipPath>${d}</defs><g clip-path="url(#${id})"><path d="${LEAF}" fill="${fl}"/>${under}${veins(vein,vw)}${over}</g><path d="${LEAF}" fill="none" stroke="${GRD}" stroke-width="1.3"/>${outside}</svg>`;
+}
+function scatter(n,seed,fn,box=[24,14,72,94]){const r=rng(seed);let s="";for(let i=0;i<n;i++){s+=fn(box[0]+r()*box[2],box[1]+r()*box[3],r)}return s}
+function fly(x,y,c="#FAFAF5",st="#B9B9AE"){return `<g transform="translate(${f1(x)} ${f1(y)})"><ellipse cx="-2" cy="0" rx="2.8" ry="1.5" transform="rotate(-28)" fill="${c}" stroke="${st}" stroke-width=".45"/><ellipse cx="2" cy="0" rx="2.8" ry="1.5" transform="rotate(28)" fill="${c}" stroke="${st}" stroke-width=".45"/></g>`}
+function gnat(x,y){return `<g transform="translate(${f1(x)} ${f1(y)})"><ellipse cx="-1.8" cy="-1" rx="2" ry="1" transform="rotate(-30)" fill="#C9CFD2" opacity=".85"/><ellipse cx="1.8" cy="-1" rx="2" ry="1" transform="rotate(30)" fill="#C9CFD2" opacity=".85"/><ellipse cx="0" cy="0" rx="1.3" ry="2.3" fill="#1F1F1C"/></g>`}
+function sl(x,y,a,s,f){return `<path d="M0 0 C 7 -5, 17 -4, 24 0 C 17 4, 7 5, 0 0 Z" transform="translate(${x} ${y}) rotate(${a}) scale(${s})" fill="${f}"/>`}
+function plant({f=GR,droop=false,n=6,stem="#3F7E2F",base=""}={}){
+  let s=`<path d="M60 68 C 57 50, 63 40, 60 24" stroke="${stem}" stroke-width="2.6" fill="none" stroke-linecap="round"/>${base}`;
+  for(let i=0;i<n;i++){const y=60-i*6.5,x=60+(i%2?1:-1)*.6;const a=droop?(i%2?62:118):(i%2?-26:206);s+=sl(x,y,a,1.05,f)}
+  s+=sl(60,25,droop?96:-90,.9,f);
+  return s;
+}
+function potSvg({plantStr="",soil="#4A3526",soilExtra="",front=""}={}){
+  return `<svg viewBox="0 0 120 120" aria-hidden="true">${plantStr}<path d="M31 70 L89 70 L82 113 L38 113 Z" fill="#B5623A"/><path d="M31 70 L89 70 L88.4 75 L31.6 75 Z" fill="#8F4A2A" opacity=".45"/><rect x="27" y="63" width="66" height="9" rx="2.5" fill="#C9774B"/><ellipse cx="60" cy="65" rx="30" ry="4.5" fill="${soil}"/>${soilExtra}${front}</svg>`;
+}
+const ILL = {
+  healthy:()=>leafSvg(),
+  yellow:()=>leafSvg({defs:`<linearGradient id="§g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#78A046"/><stop offset=".48" stop-color="#D5C24B"/><stop offset="1" stop-color="#E7D165"/></linearGradient>`,fill:"url(#§g)",vein:"#EFE3A0"}),
+  interveinal:()=>leafSvg({fill:"#E1CF5B",under:veins("#8FB04F",7,.8),vein:"#3E7B2E",vw:2.6}),
+  tips:()=>leafSvg({over:`<path d="${LEAF}" fill="none" stroke="#C8A64A" stroke-width="24" opacity=".55"/><path d="${LEAF}" fill="none" stroke="#8A5A2B" stroke-width="11"/><ellipse cx="60" cy="112" rx="20" ry="16" fill="#8A5A2B"/>`}),
+  halo:()=>leafSvg({over:[[46,40],[74,52],[52,70],[70,86],[42,88],[62,30]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${7+i%2}" fill="#E4D05A" opacity=".92"/><circle cx="${x}" cy="${y}" r="${3.6+i%2}" fill="#5A381C"/>`).join("")}),
+  scorch:()=>leafSvg({over:`<path d="M66 22 C 92 26, 104 50, 94 70 C 80 64, 68 46, 66 22 Z" fill="#EAE3C3" stroke="#9A6A34" stroke-width="2.5"/><ellipse cx="82" cy="86" rx="9" ry="6" fill="#EAE3C3" stroke="#9A6A34" stroke-width="2"/>`}),
+  stipple:()=>leafSvg({over:scatter(170,7,(x,y,r)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r="${(.7+r()*.7).toFixed(2)}" fill="#E9F0BE"/>`),
+    outside:`<g stroke="#7E8A83" stroke-width=".6" fill="none" opacity=".9"><path d="M84 20 L104 8 M88 30 L108 22 M92 44 L112 40 M104 8 L108 22 L112 40 M86 22 L100 14 L106 30 M95 12 L99 34"/></g>`}),
+  mealy:()=>leafSvg({over:[[60,28],[60,56],[60,84],[74,46],[46,62]].map(([x,y],i)=>scatter(5,i+3,(a,b,r)=>`<circle cx="${f1(x+(r()-.5)*8)}" cy="${f1(y+(r()-.5)*7)}" r="${(2+r()*1.8).toFixed(1)}" fill="#F8F8F3" stroke="#CFCFC4" stroke-width=".5"/>`)).join("")}),
+  aphids:()=>leafSvg({over:scatter(28,11,(x,y,r)=>{const a=(r()*180).toFixed(0);return `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="2.4" ry="1.6" transform="rotate(${a} ${f1(x)} ${f1(y)})" fill="${r()<.3?"#2E2E2A":"#A6CC4A"}" stroke="#3E5A1C" stroke-width=".4"/>`},[46,12,28,30])}),
+  silver:()=>leafSvg({over:`<g fill="#D3DBD7" opacity=".92"><ellipse cx="48" cy="44" rx="11" ry="6" transform="rotate(-20 48 44)"/><ellipse cx="72" cy="66" rx="12" ry="5.5" transform="rotate(15 72 66)"/><ellipse cx="52" cy="84" rx="9" ry="4.5"/></g>`
+      +scatter(10,5,(x,y)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r=".8" fill="#1D1D1B"/>`,[40,40,16,8])
+      +scatter(10,6,(x,y)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r=".8" fill="#1D1D1B"/>`,[62,63,20,7])
+      +scatter(7,9,(x,y)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r=".8" fill="#1D1D1B"/>`,[45,81,15,6])}),
+  whitefly:()=>leafSvg({over:scatter(9,13,(x,y)=>fly(x,y),[34,26,52,70]),outside:[[92,14],[102,26],[86,6],[20,18]].map(([x,y])=>fly(x,y)).join("")}),
+  powder:()=>leafSvg({over:scatter(46,21,(x,y,r)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r="${(3+r()*5).toFixed(1)}" fill="#FFFFFF" opacity="${(.3+r()*.35).toFixed(2)}"/>`)}),
+  cold:()=>leafSvg({fill:"#3A5A2E",vein:"#5E7446",over:`<g opacity=".6"><ellipse cx="50" cy="50" rx="14" ry="10" fill="#8A9A58"/><ellipse cx="72" cy="78" rx="12" ry="9" fill="#8A9A58"/></g><g fill="#2E2116" opacity=".65"><ellipse cx="68" cy="40" rx="9" ry="7"/><ellipse cx="46" cy="80" rx="8" ry="10"/></g>`}),
+  droop:()=>potSvg({plantStr:plant({f:"#6E9A45",droop:true})}),
+  rot:()=>potSvg({plantStr:plant({f:"#B9B04A",droop:true,base:`<path d="M60 68 L60 52" stroke="#3A2616" stroke-width="4.2" stroke-linecap="round"/>`}),soil:"#2B1F16",soilExtra:`<ellipse cx="72" cy="65" rx="8" ry="1.6" fill="#6C5B4B" opacity=".85"/>`}),
+  stretch:()=>potSvg({plantStr:`<g stroke="#7FA24A" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M56 68 C 50 44, 60 24, 50 6"/><path d="M63 68 C 70 46, 62 28, 72 10"/></g>`+[[53,48,200],[52,30,210],[51,14,200],[66,50,-20],[66,32,-30],[70,16,-25]].map(([x,y,a])=>sl(x,y,a,.5,"#AFC870")).join("")}),
+  drop:()=>potSvg({plantStr:plant({n:3,f:"#5E9442"}),front:sl(10,114,-8,.95,"#D8C24A")+sl(98,111,196,.9,"#9CB64E")+sl(112,117,178,.75,"#D8C24A")}),
+  crust:()=>potSvg({plantStr:plant(),soilExtra:`<path d="M31 64.5 Q 40 62.5, 50 64.5 T 70 63.8 T 89 64.5" stroke="#F4F2EA" stroke-width="2.6" fill="none"/>`+scatter(14,4,(x,y)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r="1.1" fill="#F4F2EA"/>`,[36,62,48,6]),front:`<path d="M40 76 L42 90 M70 76 L69 94 M80 76 L79 84 M28 67 L92 67" stroke="#EDEBE2" stroke-width="2" opacity=".85" stroke-linecap="round"/>`}),
+  gnats:()=>potSvg({plantStr:plant(),front:[[40,54],[48,46],[74,50],[82,42],[66,58],[36,44],[86,56]].map(([x,y])=>gnat(x,y)).join("")}),
+  mold:()=>potSvg({plantStr:plant(),soilExtra:scatter(34,17,(x,y,r)=>`<circle cx="${f1(x)}" cy="${f1(y)}" r="${(1.2+r()*1.6).toFixed(1)}" fill="#F2F2EC" opacity=".92"/>`,[36,62,48,6])})
+};
+const ill = v => (ILL[v]||ILL.healthy)();
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const G = Object.fromEntries(GROUPS.map(g=>[g.id,g]));
+const SP = Object.fromEntries(SPECIES.map(s=>[s.id,s]));
+const PR = Object.fromEntries(PROBLEMS.map(p=>[p.id,p]));
+const LUZ = {sol:"Sol direto",meia:"Meia-luz",sombra:"Sombra"};
+const LUZI = {sol:"☀️",meia:"⛅",sombra:"☁️"};
+const DIF = {1:"Fácil",2:"Média",3:"Exigente"};
+const CARE = [["luz","Luz","☀️"],["rega","Rega","💧"],["umidade","Umidade","💨"],["temperatura","Temperatura","🌡️"],["substrato","Substrato","🪴"],["adubacao","Adubação","🧪"],["extra","Dicas","📝"]];
+const CATS = ["Água","Luz e ambiente","Nutrientes","Pragas","Doenças"];
+const SEV = {1:"Leve",2:"Moderado",3:"Sério"};
+const LABEL = Object.fromEntries([...LOC,...SOLO,...CTX,...LOOK.flatMap(s=>s.items)]);
+const LOOKSET = new Set(LOOK.flatMap(s=>s.items.map(i=>i[0])));
+
+const luzOf = sp => (sp.ov&&sp.ov.luzTipo) || G[sp.g].luzTipo;
+const difOf = sp => sp.d || G[sp.g].d;
+const nDiff = sp => Object.keys(sp.ov||{}).filter(k=>k!=="luzTipo").length;
+function careRows(sp){
+  const g=G[sp.g];
+  return CARE.map(([k,label,icon])=>{
+    const spec = !!(sp.ov && sp.ov[k]);
+    return {k,label,icon,spec,text:spec?sp.ov[k]:g.care[k],base:g.care[k]};
+  });
+}
+
+const state = {
+  q:"", f:{luz:new Set(),pet:false,facil:false}, cat:"Todos",
+  diag:{sp:"",loc:new Set(),look:new Set(),solo:"",ctx:new Set()}
+};
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+function speciesRow(sp){
+  const g=G[sp.g];
+  return `<a class="row sm" href="#/planta/${sp.id}"><span class="sw" style="--gc:${g.color}" aria-hidden="true">${g.emoji}</span>
+    <span><span class="rname">${sp.n}</span><span class="sci">${sp.s}</span></span>
+    <span class="rside" title="${luzOf(sp).map(l=>LUZ[l]).join(", ")}">${luzOf(sp).map(l=>LUZI[l]).join("")}</span></a>`;
+}
+function careList(rows,withSrc){
+  return `<div class="care">${rows.map(r=>`<div class="crow${withSrc&&r.spec?" spec":""}"><span class="cico" aria-hidden="true">${r.icon}</span><div>
+    <div class="clabel">${r.label}${withSrc?`<span class="src">${r.spec?"Específico desta planta":"Padrão do grupo"}</span>`:""}</div>
+    <div class="ctext">${r.text}</div>
+    ${withSrc&&r.spec&&r.base?`<div class="cbase">${r.k==="extra"?"Dica geral do grupo":"Padrão do grupo"}: ${r.base}</div>`:""}
+  </div></div>`).join("")}</div>`;
+}
+function tile(p){return `<a class="ptile" href="#/problema/${p.id}"><div class="ill">${ill(p.ill)}</div><div class="pt"><span class="pn">${p.nome}</span><span class="cat">${p.cat}</span></div></a>`}
+
+function filterChips(){
+  const f=state.f;
+  return Object.keys(LUZ).map(k=>`<button class="chip" data-f="luz" data-v="${k}" aria-pressed="${f.luz.has(k)}">${LUZI[k]} ${LUZ[k]}</button>`).join("")
+   + `<button class="chip" data-f="pet" aria-pressed="${f.pet}">🐾 Segura para pets</button>`
+   + `<button class="chip" data-f="facil" aria-pressed="${f.facil}">Fácil de cuidar</button>`;
+}
+function guiaResults(){
+  const f=state.f, q=norm(state.q.trim());
+  const active = q || f.luz.size || f.pet || f.facil;
+  if(!active){
+    return `<h2>Grupos de cuidado</h2><p class="lead">Plantas com necessidades parecidas ficam juntas. Cada planta mostra só o que muda em relação ao seu grupo.</p>
+    <div class="list">${GROUPS.map(g=>{const n=SPECIES.filter(s=>s.g===g.id).length;return `<a class="row" href="#/grupo/${g.id}">
+      <span class="sw" style="--gc:${g.color}" aria-hidden="true">${g.emoji}</span>
+      <span><span class="rname">${g.nome}</span><span class="rmeta">${g.luzTipo.map(l=>LUZ[l]).join(" ou ")}, dificuldade ${DIF[g.d].toLowerCase()}</span></span>
+      <span class="rside">${n} plantas</span></a>`}).join("")}</div>`;
+  }
+  const list = SPECIES.filter(sp=>{
+    if(q && !norm(sp.n+" "+sp.s).includes(q)) return false;
+    if(f.luz.size && !luzOf(sp).some(l=>f.luz.has(l))) return false;
+    if(f.pet && sp.pet) return false;
+    if(f.facil && difOf(sp)!==1) return false;
+    return true;
+  }).sort((a,b)=>a.n.localeCompare(b.n,"pt"));
+  if(!list.length) return `<p class="empty">Nenhuma planta encontrada${q?` para “${esc(state.q)}”`:""}. Tente outro nome ou remova algum filtro.</p>`;
+  return `<h2>${list.length} ${list.length===1?"planta":"plantas"}</h2><div class="list">${list.map(speciesRow).join("")}</div>`;
+}
+function viewGuia(){
+  return `<h1>Encontre sua planta</h1>
+  <p class="lead">${SPECIES.length} espécies comuns em casa, com os cuidados de cada uma.</p>
+  <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input id="q" type="search" placeholder="Nome popular ou científico" value="${esc(state.q)}" autocomplete="off" aria-label="Buscar planta"></label>
+  <div class="chips" id="filters">${filterChips()}</div>
+  <div id="results">${guiaResults()}</div>`;
+}
+function viewGrupo(id){
+  const g=G[id]; if(!g) return viewGuia();
+  const sps=SPECIES.filter(s=>s.g===id);
+  return `<span class="gchip" style="--gc:${g.color}">${g.emoji} Grupo de cuidado</span>
+  <h1>${g.nome}</h1><p class="lead">${g.desc}</p>
+  <h2>Cuidados padrão</h2>
+  ${careList(CARE.map(([k,label,icon])=>({k,label,icon,text:g.care[k]})),false)}
+  <h2>Plantas deste grupo</h2>
+  <div class="list">${sps.map(sp=>`<a class="row sm" href="#/planta/${sp.id}"><span class="sw" style="--gc:${g.color}" aria-hidden="true">${g.emoji}</span>
+    <span><span class="rname">${sp.n}</span><span class="sci">${sp.s}</span></span>
+    <span class="rside">${nDiff(sp)?`${nDiff(sp)} ${nDiff(sp)===1?"diferença":"diferenças"}`:"Segue o grupo"}</span></a>`).join("")}</div>`;
+}
+function viewPlanta(id){
+  const sp=SP[id]; if(!sp) return viewGuia();
+  const g=G[sp.g];
+  const probs=sp.p.map(p=>PR[p]).filter(Boolean);
+  return `<a class="gchip" href="#/grupo/${g.id}" style="--gc:${g.color}">${g.emoji} ${g.nome}</a>
+  <h1>${sp.n}</h1><p class="sci big">${sp.s}</p>
+  <div class="badges">${luzOf(sp).map(l=>`<span class="badge">${LUZI[l]} ${LUZ[l]}</span>`).join("")}
+    <span class="badge">Dificuldade ${DIF[difOf(sp)].toLowerCase()}</span>
+    <span class="badge ${sp.pet?"toxic":"safe"}">🐾 ${sp.pet?"Tóxica para cães e gatos":"Segura para pets"}</span></div>
+  ${careList(careRows(sp),true)}
+  <p class="legend">Os itens destacados são diferentes do padrão do grupo; os demais valem para todo o grupo.</p>
+  <h2>Problemas mais comuns</h2>
+  <div class="tiles">${probs.map(tile).join("")}</div>
+  <div class="ctabar"><div class="ctabar-in"><button class="cta" data-diag-sp="${sp.id}">Diagnosticar um problema nesta planta</button></div></div>`;
+}
+function chip(group,v,label,on){return `<button class="chip" data-chip="${group}" data-v="${v}" aria-pressed="${on}">${label}</button>`}
+function viewDiag(){
+  const d=state.diag;
+  const opts=[...SPECIES].sort((a,b)=>a.n.localeCompare(b.n,"pt"));
+  return `<h1>O que está acontecendo?</h1>
+  <p class="lead">Marque o que você observa. O resultado mostra as causas mais prováveis e como confirmar cada uma.</p>
+  <div class="soon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    <span>Diagnóstico por foto chega na próxima versão. Por enquanto, descreva o que você vê.</span></div>
+  <section class="step"><h2><span class="n">1</span>Qual é a planta?</h2><p class="small">Opcional, mas melhora o resultado.</p>
+    <select id="sp" aria-label="Planta"><option value="">Não sei ou não está na lista</option>${opts.map(s=>`<option value="${s.id}"${d.sp===s.id?" selected":""}>${s.n}</option>`).join("")}</select></section>
+  <section class="step"><h2><span class="n">2</span>Onde aparece?</h2>
+    <div class="chips">${LOC.map(([v,l])=>chip("loc",v,l,d.loc.has(v))).join("")}</div></section>
+  <section class="step"><h2><span class="n">3</span>O que você vê?</h2><p class="small">Marque tudo o que se aplica.</p>
+    ${LOOK.map(s=>`<p class="sub">${s.t}</p><div class="chips">${s.items.map(([v,l])=>chip("look",v,l,d.look.has(v))).join("")}</div>`).join("")}</section>
+  <section class="step"><h2><span class="n">4</span>Como está o substrato agora?</h2>
+    <div class="chips">${SOLO.map(([v,l])=>chip("solo",v,l,d.solo===v)).join("")}</div></section>
+  <section class="step"><h2><span class="n">5</span>Algo mudou nas últimas semanas?</h2>
+    <div class="chips">${CTX.map(([v,l])=>chip("ctx",v,l,d.ctx.has(v))).join("")}</div></section>
+  <div class="ctabar"><div class="ctabar-in"><button class="ghost" id="clear">Limpar</button><button class="cta" id="go">Ver possíveis causas</button></div><p class="hint" id="hint"></p></div>`;
+}
+function diagnose(){
+  const d=state.diag;
+  const tags=new Set([...d.loc,...d.look,...d.ctx]); if(d.solo) tags.add(d.solo);
+  const sp=SP[d.sp];
+  return PROBLEMS.map(p=>{
+    let s=0,primary=false;
+    for(const [t,w] of Object.entries(p.tags)){ if(tags.has(t)){ s+=w; if(LOOKSET.has(t)) primary=true; } }
+    if(sp && sp.p.includes(p.id)) s+=1.5;
+    return {p,s,primary};
+  }).filter(r=>r.primary && r.s>=3).sort((a,b)=>b.s-a.s);
+}
+function level(s){return s>=8?["m3","Alta compatibilidade"]:s>=5?["m2","Compatibilidade média"]:["m1","Possível"]}
+function viewResultado(){
+  const d=state.diag;
+  if(!d.look.size) return `<h1>Possíveis causas</h1><p class="empty">Marque pelo menos um sintoma em “O que você vê?” para ver o resultado.</p><a class="cta" href="#/diag" style="display:block">Voltar ao diagnóstico</a>`;
+  const res=diagnose(); const top=res.slice(0,4), rest=res.slice(4);
+  const sp=SP[d.sp];
+  const marked=[...(sp?[sp.n]:[]),...d.loc,...d.look,...(d.solo?[d.solo]:[]),...d.ctx].map(t=>LABEL[t]||t);
+  const card=r=>{const [c,l]=level(r.s);return `<a class="res" href="#/problema/${r.p.id}"><div class="ill">${ill(r.p.ill)}</div><div>
+    <span class="match ${c}">${l}</span><span class="pn">${r.p.nome}</span><p>${r.p.resumo}</p></div></a>`};
+  return `<h1>Possíveis causas</h1>
+  <div class="mini">${marked.map(m=>`<span>${m}</span>`).join("")}</div>
+  ${top.length?top.map(card).join(""):`<p class="empty">Nenhuma causa do catálogo combina com essa combinação. Tente marcar menos sintomas ou procure no catálogo de problemas.</p>`}
+  ${rest.length?`<details><summary>Outras ${rest.length} possibilidades</summary>${rest.map(card).join("")}</details>`:""}
+  <p class="note">Sintomas parecidos podem ter causas diferentes. Abra cada resultado e use “Como confirmar” antes de tratar. Mude uma coisa por vez e espere 1–2 semanas para ver o efeito.</p>
+  <div class="ctabar"><div class="ctabar-in"><a class="ghost" href="#/diag" style="text-decoration:none">Ajustar sintomas</a><a class="cta" href="#/problemas">Ver catálogo</a></div></div>`;
+}
+function viewProblemas(){
+  const list = state.cat==="Todos"?PROBLEMS:PROBLEMS.filter(p=>p.cat===state.cat);
+  return `<h1>Problemas e soluções</h1>
+  <p class="lead">${PROBLEMS.length} problemas comuns em plantas de casa, com como identificar e como resolver.</p>
+  <div class="chips">${["Todos",...CATS].map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${state.cat===c}">${c}</button>`).join("")}</div>
+  <div class="tiles">${list.map(tile).join("")}</div>`;
+}
+function viewProblema(id){
+  const p=PR[id]; if(!p) return viewProblemas();
+  const afetadas=SPECIES.filter(s=>s.p.includes(id));
+  return `<div class="hero-ill">${ill(p.ill)}</div>
+  <div class="badges" style="margin:12px 0 0"><span class="badge">${p.cat}</span><span class="sev ${p.sev===3?"s3":""}">${SEV[p.sev]}</span></div>
+  <h1>${p.nome}</h1><p class="lead">${p.resumo}</p>
+  <h2>Como confirmar</h2><div class="box">${p.confirmar}</div>
+  <h2>O que fazer</h2><div class="box"><ol class="steps">${p.solucao.map(s=>`<li><span>${s}</span></li>`).join("")}</ol></div>
+  <h2>Prevenção</h2><div class="box">${p.prevencao}</div>
+  ${afetadas.length?`<h2>Plantas mais afetadas</h2><div class="list">${afetadas.map(speciesRow).join("")}</div>`:""}`;
+}
+
+/* ============================================================
+   ROTEAMENTO E EVENTOS
+   ============================================================ */
+const main=$("#main"), backBtn=$("#back");
+let depth=0, backing=false;
+function parse(){const h=(location.hash||"#/guia").replace(/^#\/?/,"");const [a,b]=h.split("/");return {a:a||"guia",b}}
+function tabRoot(a){return ["diag"].includes(a)?"#/diag":["problemas","problema"].includes(a)?"#/problemas":"#/guia"}
+function render(){
+  const {a,b}=parse(); let html,tab="guia";
+  switch(a){
+    case "grupo": html=viewGrupo(b); break;
+    case "planta": html=viewPlanta(b); break;
+    case "diag": html=b==="resultado"?viewResultado():viewDiag(); tab="diag"; break;
+    case "problemas": html=viewProblemas(); tab="problemas"; break;
+    case "problema": html=viewProblema(b); tab="problemas"; break;
+    default: html=viewGuia();
+  }
+  main.innerHTML=html;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
+  backBtn.hidden = ["guia","diag","problemas"].includes(a) && !b;
+  if(a==="diag" && !b) updateCTA();
+  window.scrollTo(0,0);
+}
+function updateCTA(){
+  const go=$("#go"), hint=$("#hint"); if(!go) return;
+  const ok=state.diag.look.size>0;
+  go.disabled=!ok; hint.textContent=ok?"":"Marque pelo menos um sintoma em “O que você vê?”.";
+}
+window.addEventListener("hashchange",()=>{ if(backing){depth=Math.max(0,depth-1);backing=false}else depth++; render(); });
+backBtn.addEventListener("click",()=>{ if(depth>0){backing=true;history.back()} else location.hash=tabRoot(parse().a); });
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,[data-cat]"); if(!t) return;
+  if(t.dataset.f){
+    const f=state.f;
+    if(t.dataset.f==="luz"){ const v=t.dataset.v; f.luz.has(v)?f.luz.delete(v):f.luz.add(v); }
+    else f[t.dataset.f]=!f[t.dataset.f];
+    $("#filters").innerHTML=filterChips(); $("#results").innerHTML=guiaResults(); return;
+  }
+  if(t.dataset.chip){
+    const g=t.dataset.chip, v=t.dataset.v, d=state.diag;
+    if(g==="solo"){ d.solo = d.solo===v?"":v; document.querySelectorAll('[data-chip="solo"]').forEach(c=>c.setAttribute("aria-pressed",c.dataset.v===d.solo)); }
+    else { const s=d[g]; s.has(v)?s.delete(v):s.add(v); t.setAttribute("aria-pressed",s.has(v)); }
+    updateCTA(); return;
+  }
+  if(t.dataset.cat){ state.cat=t.dataset.cat; main.innerHTML=viewProblemas(); return; }
+  if(t.dataset.diagSp){ state.diag.sp=t.dataset.diagSp; location.hash="#/diag"; return; }
+  if(t.id==="go" && !t.disabled){ location.hash="#/diag/resultado"; return; }
+  if(t.id==="clear"){ state.diag={sp:"",loc:new Set(),look:new Set(),solo:"",ctx:new Set()}; main.innerHTML=viewDiag(); updateCTA(); return; }
+});
+document.addEventListener("input",e=>{ if(e.target.id==="q"){ state.q=e.target.value; $("#results").innerHTML=guiaResults(); } });
+document.addEventListener("change",e=>{ if(e.target.id==="sp") state.diag.sp=e.target.value; });
+
+render();
+/* PWA: instala o service worker para funcionar offline e permitir "Adicionar à tela inicial" */
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }); }
+</script>
+</body>
+</html>
