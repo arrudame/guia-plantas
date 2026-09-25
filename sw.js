@@ -1,6 +1,6 @@
 // Service worker do Guia de Plantas.
 // Ao publicar uma nova versão do app, aumente o número abaixo para os usuários receberem a atualização.
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = "guia-plantas-" + VERSION;
 const APP_SHELL = [
   "./",

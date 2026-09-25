@@ -57,7 +57,9 @@ img,svg{max-width:100%}
 .brand{font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:-.01em}
 .ver{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:auto}
 
-main{padding-top:6px;padding-bottom:110px}
+/* --tabs-h: altura real da barra de abas (medida via JS; o valor abaixo é só o padrão) */
+:root{--tabs-h:calc(66px + env(safe-area-inset-bottom,0px))}
+main{padding-top:6px;padding-bottom:calc(var(--tabs-h) + 32px)}
 
 /* abas */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -139,7 +141,7 @@ h2{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.2;margi
 .step h2 .n{font-family:var(--sans);font-size:14px;font-weight:700;color:var(--accent-ink);background:var(--accent);border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;transform:translateY(-3px)}
 .sub{font-size:14px;font-weight:700;color:var(--muted);margin:16px 0 0}
 select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
-.ctabar{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom,0px));padding:14px 0 6px;margin-top:20px;background:linear-gradient(to bottom,transparent,var(--bg) 35%)}
+.ctabar{position:sticky;bottom:var(--tabs-h);padding:14px 0 6px;margin-top:20px;background:linear-gradient(to bottom,transparent,var(--bg) 35%)}
 .ctabar-in{display:flex;gap:10px}
 .cta{flex:1;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:15px;font:inherit;font-weight:700;font-size:16px;cursor:pointer;text-align:center;text-decoration:none}
 .cta:disabled{opacity:.4;cursor:not-allowed}
@@ -969,6 +971,11 @@ document.addEventListener("input",e=>{ if(e.target.id==="q"){ state.q=e.target.v
 document.addEventListener("change",e=>{ if(e.target.id==="sp") state.diag.sp=e.target.value; });
 
 render();
+/* Mantém o conteúdo acima da barra de abas, cuja altura muda com a área segura do aparelho e o tamanho da fonte */
+const tabsEl=document.querySelector(".tabs");
+const syncTabsH=()=>document.documentElement.style.setProperty("--tabs-h",tabsEl.offsetHeight+"px");
+syncTabsH(); window.addEventListener("resize",syncTabsH);
+if("ResizeObserver" in window) new ResizeObserver(syncTabsH).observe(tabsEl);
 /* PWA: instala o service worker para funcionar offline e permitir "Adicionar à tela inicial" */
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }); }
 </script>
